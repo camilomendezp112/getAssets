@@ -1,7 +1,5 @@
 **Ejecucion**
 
-Revisa por medio de la PK (tentanID) y SK (AssetID) para eliminar el activo solicitado
+Toma el Id de usuario junto al Tenant Id para loguear el inventario que es donde realizará la consulta
 
-Verifica si existe, si no existe devuelve error donde no encuentra el activo (Asset)
-
-Si lo encuentra y se loguea correctamente permite eliminar el activo
+Según la consulta que desee realizar o filtrar el programa buscará el activo o los activos solicitados
