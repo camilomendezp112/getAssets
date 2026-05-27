@@ -80,27 +80,42 @@ def get_secure_image_url(stored_url):
 
 
 def format_producto(item):
-    """
-    Formats product attributes. Excludes discount_price if it is 0.
-    """
+
     producto = {
-        'id_producto': item.get('product_id') or item.get('id_producto'),
         'product_id': item.get('product_id') or item.get('id_producto'),
+
         'name': item.get('name') or item.get('nombre'),
-        'description': item.get('description') or item.get('descripcion', ''),
-        'category': item.get('category') or item.get('tipo') or item.get('type', ''),
+
+        'category': (
+            item.get('category')
+            or item.get('tipo')
+            or item.get('type', '')
+        ),
+
+        'description': (
+            item.get('description')
+            or item.get('descripcion', '')
+        ),
+
         'price': float(item.get('price', 0.0)),
+
+        'discount_price': float(item.get('discount_price', 0.0)),
+
         'stock': int(item.get('stock', 0)),
-        'image_url': get_secure_image_url(item.get('image_url')),
+
+        'imageUrl': get_secure_image_url(
+            item.get('image_url') or item.get('imageUrl')
+        ),
+
         'status': item.get('status', 'ACTIVE'),
-        'created_at': item.get('created_at'),
-        'updated_at': item.get('updated_at')
+
+        'createdAt': item.get('created_at'),
+
+        'updatedAt': item.get('updated_at')
     }
 
-    # Exclude discount_price when it is 0
-    discount_price = float(item.get('discount_price', 0.0))
-    if discount_price != 0.0:
-        producto['discount_price'] = discount_price
+    if producto['discount_price'] == 0:
+        producto.pop('discount_price')
 
     return producto
 
