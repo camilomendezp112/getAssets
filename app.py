@@ -1,7 +1,6 @@
 import json
 import os
 import boto3
-import sentry_sdk
 from boto3.dynamodb.conditions import Key
 
 # Initialize AWS clients
@@ -12,13 +11,19 @@ table = dynamodb.Table(TABLE_NAME)
 s3_client = boto3.client('s3')
 BUCKET_NAME = os.environ.get('BUCKET_NAME')
 
-sentry_sdk.init(
-    dsn=os.environ.get("SENTRY_DSN", ""),
-    traces_sample_rate=1.0
-)
+# Safely import and initialize Sentry
+try:
+    import sentry_sdk
+    sentry_sdk.init(
+        dsn=os.environ.get("SENTRY_DSN", ""),
+        traces_sample_rate=1.0
+    )
+    sentry_sdk.set_tag("module", "getAssets")
+    sentry_sdk.set_tag("team", "grupo-3")
+    HAS_SENTRY = True
+except ImportError:
+    HAS_SENTRY = False
 
-sentry_sdk.set_tag("module", "getAssets")
-sentry_sdk.set_tag("team", "grupo-3")
 
 
 def make_response(success, code, data):
@@ -162,6 +167,7 @@ def lambda_handler(event, context):
         return make_response(True, 200, {'productos': productos})
 
     except Exception as e:
-        sentry_sdk.capture_exception(e)
+        if HAS_SENTRY:
+            sentry_sdk.capture_exception(e)
         print(f"Error: {str(e)}")
         return make_response(False, 500, {'error': f'Internal server error: {str(e)}'})
